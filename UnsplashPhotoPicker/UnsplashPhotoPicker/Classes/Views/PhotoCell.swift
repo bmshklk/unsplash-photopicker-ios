@@ -8,7 +8,13 @@
 
 import UIKit
 
+typealias AuthorSelectionBlock = (_ author: UnsplashUser) -> Void
 class PhotoCell: UICollectionViewCell {
+
+    var authorSelected: AuthorSelectionBlock? {
+        get { photoView.authorSelected }
+        set { photoView.authorSelected = newValue }
+    }
 
     // MARK: - Properties
 

@@ -20,6 +20,10 @@ extension UnsplashPhotoPickerViewController: UICollectionViewDataSource {
         guard let photoCell = cell as? PhotoCell, let photo = dataSource.item(at: indexPath.item) else { return cell }
 
         photoCell.configure(with: photo)
+        photoCell.authorSelected = { [weak self] name in
+            guard let self else { return }
+            self.delegate?.unsplashPhotoPickerViewController(self, didSelectAuthor: name)
+        }
 
         return photoCell
     }

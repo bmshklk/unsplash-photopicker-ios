@@ -119,6 +119,24 @@ extension ViewController: UnsplashPhotoPickerDelegate {
     func unsplashPhotoPickerDidCancel(_ photoPicker: UnsplashPhotoPicker) {
         print("Unsplash photo picker did cancel")
     }
+
+    func unsplashPhotoPicker(_ photoPicker: UnsplashPhotoPicker,
+                             didSelectAuthor user: UnsplashUser) {
+
+        let utm_source = "my_app"
+        let authorLink = "https://unsplash.com/@\(user.username)?utm_source=\(utm_source)&utm_medium=referral"
+        if let url = URL(string: authorLink) {
+
+            /*
+             let svc = SFSafariViewController(url: url)
+             svc.delegate = self
+             photoPicker.present(svc, animated: true)
+            */
+
+            UIApplication.shared.open(url)
+        }
+    }
+
 }
 
 // MARK: - UITextFieldDelegate

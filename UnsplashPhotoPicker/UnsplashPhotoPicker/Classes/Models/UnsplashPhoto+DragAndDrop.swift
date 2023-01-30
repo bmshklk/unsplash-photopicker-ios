@@ -21,7 +21,7 @@ extension UnsplashPhoto {
                 return nil
             }
 
-            photoView.userNameLabel.isHidden = true
+            photoView.userNameButton.isHidden = true
             photoView.layer.cornerRadius = 12
             photoView.frame.size.width = 300
             photoView.frame.size.height = 300 * CGFloat(self.height) / CGFloat(self.width)

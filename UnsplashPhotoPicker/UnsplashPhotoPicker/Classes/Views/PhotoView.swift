@@ -10,6 +10,8 @@ import UIKit
 
 class PhotoView: UIView {
 
+    var authorSelected: AuthorSelectionBlock?
+
     static var nib: UINib { return UINib(nibName: "PhotoView", bundle: Bundle.local) }
 
     private var currentPhotoID: String?
@@ -18,12 +20,12 @@ class PhotoView: UIView {
 
     @IBOutlet weak var imageView: UIImageView!
     @IBOutlet weak var gradientView: GradientView!
-    @IBOutlet weak var userNameLabel: UILabel!
-    @IBOutlet var overlayViews: [UIView]!
+    @IBOutlet var userNameButton: UIButton!
+    private var photo: UnsplashPhoto?
 
     var showsUsername = true {
         didSet {
-            userNameLabel.alpha = showsUsername ? 1 : 0
+            userNameButton.alpha = showsUsername ? 1 : 0
             gradientView.alpha = showsUsername ? 1 : 0
         }
     }
@@ -40,26 +42,48 @@ class PhotoView: UIView {
 
     func prepareForReuse() {
         currentPhotoID = nil
-        userNameLabel.text = nil
+        userNameButton.setAttributedTitle(nil, for: .normal)
         imageView.backgroundColor = .clear
         imageView.image = nil
+        photo = nil
         imageDownloader.cancel()
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
         let fontSize: CGFloat = traitCollection.horizontalSizeClass == .compact ? 10 : 13
-        userNameLabel.font = UIFont.systemFont(ofSize: fontSize)
+        updateUsernameButtonTitle(photo?.user.displayName, fontSize: fontSize)
+    }
+
+    @IBAction func handleAuthorTap(sender: UIButton) {
+        guard let user = photo?.user else { return }
+        authorSelected?(user)
     }
 
     // MARK: - Setup
 
     func configure(with photo: UnsplashPhoto, showsUsername: Bool = true) {
+        self.photo = photo
         self.showsUsername = showsUsername
-        userNameLabel.text = photo.user.displayName
         imageView.backgroundColor = photo.color
         currentPhotoID = photo.identifier
         downloadImage(with: photo)
+        updateUsernameButtonTitle(photo.user.displayName)
+    }
+
+    private func updateUsernameButtonTitle(_ title: String?, fontSize: CGFloat = 13) {
+        guard let title else {
+            userNameButton.setAttributedTitle(nil, for: .normal)
+            return
+        }
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: fontSize),
+            .foregroundColor: UIColor.white,
+            .underlineStyle: NSUnderlineStyle.single.rawValue,
+            .underlineColor: UIColor.white
+        ]
+        let usernameTitle = NSAttributedString(string: title, attributes: attributes)
+        userNameButton.setAttributedTitle(usernameTitle, for: .normal)
     }
 
     private func downloadImage(with photo: UnsplashPhoto) {
